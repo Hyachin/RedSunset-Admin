@@ -4,12 +4,7 @@
       <el-form-item label="活动名称">
         <el-input placeholder="请输入" />
       </el-form-item>
-      <el-form-item label="活动类型">
-        <!-- <el-input placeholder="请输入" /> -->
-        <el-select placeholder="请选择">
-          <el-option>1</el-option>
-        </el-select>
-      </el-form-item>
+
       <el-form-item label="活动时间">
         <el-date-picker
           v-model="value2"
@@ -28,21 +23,23 @@
     </el-form>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column label="序号" type="index" width="50" />
-      <el-table-column prop="date" label="活动名称" width="150" />
-      <el-table-column prop="name" label="活动类型" width="120" />
-      <el-table-column prop="province" label="开始时间" width="120" />
-      <el-table-column prop="city" label="结束时间" width="120" />
-      <el-table-column prop="city" label="当前参与数" width="120" />
-      <el-table-column prop="address" label="活动简介" />
-      <el-table-column prop="zip" label="发布时间" width="120" />
+      <!-- 同时是活动标签 -->
+      <el-table-column prop="date" label="活动名称" />
+      <el-table-column prop="province" label="开始时间" />
+      <el-table-column prop="city" label="结束时间" />
+      <!-- 线上或线下 -->
+      <el-table-column prop="name" label="活动地点" />
+      <el-table-column prop="city" label="当前参与/报名人数" />
+      <!-- <el-table-column prop="address" label="活动简介" /> -->
+      <el-table-column prop="zip" label="发布时间" />
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
+          <el-button type="text" size="small" @click="toEdit">编辑</el-button>
           <el-button
             type="text"
             size="small"
             @click="handleClick(scope.row)"
-          >查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,10 +83,46 @@ export default {
           address: '上海市普陀区金沙江路 1516 弄',
           zip: 200333
         }
-      ]
+      ],
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+      value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+      value2: ''
     }
   },
   methods: {
+    toEdit() {
+      this.$router.push('/activityCenter/edit')
+    },
     handleClick(row) {
       console.log(row)
     }
