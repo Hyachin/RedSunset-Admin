@@ -75,7 +75,6 @@ export default {
         detail: ''
         //
       },
-
       //
       editor: null,
       toolbarConfig: {},
@@ -112,27 +111,16 @@ export default {
             }
           }
         ]
-      },
-      value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-      value2: ''
+      }
     }
   },
-  mounted() {
-    // 模拟 ajax 请求，异步渲染编辑器
-    // this.createEditor();
-  },
+  mounted() {},
   beforeDestroy() {
     const editor = this.editor
     if (editor == null) return
     editor.destroy() // 组件销毁时，及时销毁编辑器
   },
   methods: {
-    // createEditor() {
-    //   console.log("上传地址", process.env.VUE_APP_Back_End + "/dynamic/upload");
-    //   this.editorConfig.MENU_CONF["uploadImage"] = {
-    //     server: "http://127.0.0.1:7001/api/upload-img", // 上传图片地址
-    //   };
-    // },
     goBack() {
       this.$router.back()
     },

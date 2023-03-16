@@ -1,13 +1,17 @@
 <template>
   <div class="wrapper">
-    <el-form :inline="true" size="mini">
+    <el-form :inline="true" size="mini" :model="tableFormFilter">
       <el-form-item label="活动名称">
-        <el-input placeholder="请输入" />
+        <el-input
+          v-model="tableFormFilter.activityName"
+          placeholder="请输入"
+          clearable
+        />
       </el-form-item>
 
       <el-form-item label="活动时间">
         <el-date-picker
-          v-model="value2"
+          v-model="tableFormFilter.time"
           type="daterange"
           align="right"
           unlink-panels
@@ -18,72 +22,77 @@
         />
       </el-form-item>
       <div style="margin-bottom: 20px">
-        <el-button size="mini" type="primary">查询</el-button>
+        <el-button
+          size="mini"
+          type="primary"
+          @click="getTableData"
+        >查询</el-button>
       </div>
     </el-form>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table
+      v-loading="isLoading"
+      :data="tableData"
+      border
+      style="width: 100%"
+    >
       <el-table-column label="序号" type="index" width="50" />
       <!-- 同时是活动标签 -->
-      <el-table-column prop="date" label="活动名称" />
-      <el-table-column prop="province" label="开始时间" />
-      <el-table-column prop="city" label="结束时间" />
+      <el-table-column prop="activityName" label="活动名称" />
+      <el-table-column prop="startTime" label="开始时间" />
+      <el-table-column prop="endTime" label="结束时间" />
       <!-- 线上或线下 -->
-      <el-table-column prop="name" label="活动地点" />
-      <el-table-column prop="city" label="当前参与/报名人数" />
+      <el-table-column prop="place" label="活动地点" />
+      <el-table-column prop="participants" label="当前参与/报名人数" />
       <!-- <el-table-column prop="address" label="活动简介" /> -->
-      <el-table-column prop="zip" label="发布时间" />
+      <el-table-column prop="publishTime" label="发布时间" />
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="toEdit">编辑</el-button>
           <el-button
             type="text"
             size="small"
-            @click="handleClick(scope.row)"
-          >删除</el-button>
+            @click="toEdit(scope.row)"
+          >编辑</el-button>
+          <template>
+            <el-popconfirm title="你确定删除此活动吗？">
+              <el-button
+                slot="reference"
+                style="margin-left: 10px"
+                type="text"
+                size="small"
+                @click="handleClick(scope.row)"
+              >删除</el-button>
+            </el-popconfirm>
+          </template>
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      :current-page="tableFormFilter.pageNum"
+      :page-sizes="[10, 20, 30, 40]"
+      :page-size="100"
+      layout="->, total, sizes, prev, pager, next, jumper"
+      :total="tableFormFilter.total"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
   </div>
 </template>
 
 <script>
+import { reqActivityList } from '@/api/activity'
+import * as dayjs from 'dayjs'
 export default {
   data() {
     return {
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          date: '2016-05-04',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1517 弄',
-          zip: 200333
-        },
-        {
-          date: '2016-05-01',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1519 弄',
-          zip: 200333
-        },
-        {
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1516 弄',
-          zip: 200333
-        }
-      ],
+      isLoading: false,
+      tableFormFilter: {
+        pageSize: 10,
+        pageNum: 1,
+        total: 0,
+        activityName: undefined,
+        time: [undefined, undefined]
+      },
+      tableData: [],
       pickerOptions: {
         shortcuts: [
           {
@@ -114,17 +123,51 @@ export default {
             }
           }
         ]
-      },
-      value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-      value2: ''
+      }
     }
   },
+  mounted() {
+    this.getTableData()
+  },
   methods: {
-    toEdit() {
-      this.$router.push('/activityCenter/edit')
+    async getTableData() {
+      this.isLoading = true
+
+      const res = await reqActivityList({
+        ...this.tableFormFilter,
+        startTime: this.tableFormFilter.time
+          ? this.tableFormFilter.time[0]
+          : undefined,
+        endTime: this.tableFormFilter.time
+          ? this.tableFormFilter.time[1]
+          : undefined
+      })
+      console.log('获取活动列表', res)
+      if (res.status === 200) {
+        this.isLoading = false
+        this.tableFormFilter.total = res.data.count
+        this.tableData = res.data.rows
+        this.tableData.forEach((item) => {
+          item.startTime = dayjs(item.startTime).format('YYYY-MM-DD')
+          item.endTime = dayjs(item.endTime).format('YYYY-MM-DD')
+          item.publishTime = dayjs(item.publishTime).format('YYYY-MM-DD')
+        })
+      }
+    },
+    toEdit(item) {
+      console.log('toEi', item)
+      this.$router.push(`/activityCenter/edit?id=${item.id}`)
     },
     handleClick(row) {
       console.log(row)
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`)
+      this.tableFormFilter.pageNum = val
+      this.getTableData()
     }
   }
 }
