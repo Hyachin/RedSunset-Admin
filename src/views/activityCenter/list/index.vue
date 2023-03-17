@@ -27,6 +27,11 @@
           type="primary"
           @click="getTableData"
         >查询</el-button>
+        <el-button
+          size="mini"
+          type="primary"
+          @click="toEdit(null)"
+        >新增</el-button>
       </div>
     </el-form>
     <el-table
@@ -155,8 +160,12 @@ export default {
       }
     },
     toEdit(item) {
-      console.log('toEi', item)
-      this.$router.push(`/activityCenter/edit?id=${item.id}`)
+      console.log('item', item)
+      if (item) {
+        this.$router.push(`/activityCenter/edit?id=${item.id}`)
+      } else {
+        this.$router.push(`/activityCenter/edit`)
+      }
     },
     handleClick(row) {
       console.log(row)

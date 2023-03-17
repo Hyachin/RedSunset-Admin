@@ -45,7 +45,6 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">发布</el-button>
-        <el-button>取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -54,6 +53,13 @@
 <script>
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
+import {
+  reqActivityInfo,
+  reqActivityEdit,
+  reqActivityAdd
+} from '@/api/activity'
+import dayjs from 'dayjs'
+import { getText, isNull } from '@/utils/judgeEditor'
 export default {
   components: { Editor, Toolbar },
   data() {
@@ -114,21 +120,37 @@ export default {
       }
     }
   },
-  mounted() {},
+  mounted() {
+    if (this.$route.query.id) {
+      this.getDetailInfo()
+    }
+  },
   beforeDestroy() {
     const editor = this.editor
     if (editor == null) return
     editor.destroy() // 组件销毁时，及时销毁编辑器
   },
   methods: {
+    async getDetailInfo() {
+      const res = await reqActivityInfo(this.$route.query.id)
+      if (res.status === 200) {
+        this.form = res.data
+        this.$set(this.form, 'time', [
+          dayjs(res.data.startTime).format('YYYY-MM-DD HH:mm:ss'),
+          dayjs(res.data.endTime).format('YYYY-MM-DD HH:mm:ss')
+        ])
+      }
+    },
+
     goBack() {
       this.$router.back()
     },
     onSubmit() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(async(valid) => {
         if (valid) {
           console.log('submit!', this.form, this.html)
-          if (!this.form.detail) {
+          const text = getText(this.form.detail)
+          if (isNull(text)) {
             this.$message.error('请输入活动详情')
             return
           }
@@ -138,9 +160,18 @@ export default {
             place,
             startTime: time[0],
             endTime: time[1],
-            detail
+            detail,
+            id: this.$route.query.id
           }
-          console.log('发布', params)
+          if (params.id) {
+            console.log('发布- 修改', params)
+            const res = await reqActivityEdit(params)
+            console.log('111', res)
+          } else {
+            const res = await reqActivityAdd(params)
+
+            console.log('发布- 新增', res)
+          }
         }
       })
     },
