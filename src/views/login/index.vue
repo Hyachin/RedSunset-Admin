@@ -99,7 +99,8 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
-// import { login } from '@/api/user'
+import { login } from '@/api/user2'
+import { setToken } from '@/utils/auth'
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -183,33 +184,34 @@ export default {
       this.$refs.loginForm.validate(async(valid) => {
         if (valid) {
           this.loading = true
-          // console.log("this.loginForm", this.loginForm);
-          // const res = await login(this.loginForm);
-          // console.log("res", res);
-          // if (res.status === 200) {
-          //   this.$message.success("登录成功");
-          //   console.log("123", this.$router);
-          //   this.$router.push("/");
-          //   this.loading = false;
+          console.log('this.loginForm', this.loginForm)
+          const res = await login(this.loginForm)
+          setToken(res.data.token)
+          console.log('res', res)
+          if (res.status === 200) {
+            this.$message.success('登录成功')
+            console.log('123', this.$router)
+            this.$router.push('/')
+            this.loading = false
+          } else {
+            this.$message.error(res.errMsg)
+            this.loading = false
+          }
+          //   this.$store
+          //     .dispatch('user/login', this.loginForm)
+          //     .then(() => {
+          //       this.$router.push({
+          //         path: this.redirect || '/',
+          //         query: this.otherQuery
+          //       })
+          //       this.loading = false
+          //     })
+          //     .catch(() => {
+          //       this.loading = false
+          //     })
           // } else {
-          //   this.$message.error(res.errMsg);
-          //   this.loading = false;
-          // }
-          this.$store
-            .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({
-                path: this.redirect || '/',
-                query: this.otherQuery
-              })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
+          //   console.log('error submit!!')
+          //   return false
         }
       })
     },
