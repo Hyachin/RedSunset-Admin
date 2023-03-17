@@ -19,11 +19,11 @@
           v-model="form.time"
           value-format="yyyy-MM-dd HH:mm:ss"
           type="datetimerange"
-          :picker-options="pickerOptions"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           align="right"
+          :picker-options="pickerOptions"
         />
       </el-form-item>
       <el-form-item label="活动详情" prop="detail">
@@ -88,35 +88,9 @@ export default {
       mode: 'default',
       //
       pickerOptions: {
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          }
-        ]
+        disabledDate(v) {
+          return v.getTime() < new Date().getTime() - 86400000 //  - 86400000是否包括当天
+        }
       }
     }
   },
@@ -167,9 +141,16 @@ export default {
             console.log('发布- 修改', params)
             const res = await reqActivityEdit(params)
             console.log('111', res)
+            if (res.status === 200) {
+              this.$message.success('修改成功')
+              this.$router.back()
+            }
           } else {
             const res = await reqActivityAdd(params)
-
+            if (res.status === 200) {
+              this.$message.success('添加成功')
+              this.$router.back()
+            }
             console.log('发布- 新增', res)
           }
         }

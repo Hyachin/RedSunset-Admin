@@ -58,13 +58,15 @@
             @click="toEdit(scope.row)"
           >编辑</el-button>
           <template>
-            <el-popconfirm title="你确定删除此活动吗？">
+            <el-popconfirm
+              title="你确定删除此活动吗？"
+              @onConfirm="deleteActivity(scope.row)"
+            >
               <el-button
                 slot="reference"
                 style="margin-left: 10px"
                 type="text"
                 size="small"
-                @click="handleClick(scope.row)"
               >删除</el-button>
             </el-popconfirm>
           </template>
@@ -84,7 +86,7 @@
 </template>
 
 <script>
-import { reqActivityList } from '@/api/activity'
+import { reqActivityList, reqActivityDelete } from '@/api/activity'
 import * as dayjs from 'dayjs'
 export default {
   data() {
@@ -167,8 +169,13 @@ export default {
         this.$router.push(`/activityCenter/edit`)
       }
     },
-    handleClick(row) {
+    async deleteActivity(row) {
       console.log(row)
+      const res = await reqActivityDelete(row.id)
+      if (res.status === 200) {
+        this.$message.success('删除成功')
+        this.getTableData()
+      }
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)

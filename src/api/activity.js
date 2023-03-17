@@ -33,3 +33,13 @@ export function reqActivityAdd(data) {
     data
   })
 }
+// 删除
+export function reqActivityDelete(id) {
+  return request({
+    url: '/activity/del',
+    method: 'delete',
+    data: {
+      id
+    }
+  })
+}
