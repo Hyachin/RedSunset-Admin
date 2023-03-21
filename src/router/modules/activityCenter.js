@@ -23,8 +23,6 @@ const activityCenterRouter = {
   ],
   meta: {
     roles: ['admin', 'editor']
-    // title: "活动中心",
-
   }
 }
 
