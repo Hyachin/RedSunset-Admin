@@ -26,6 +26,15 @@
           :picker-options="pickerOptions"
         />
       </el-form-item>
+      <el-form-item label="截止时间" prop="deadline">
+        <el-date-picker
+          v-model="form.deadline"
+          type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="请选择报名截止时间"
+        />
+      </el-form-item>
+
       <el-form-item label="活动详情" prop="detail">
         <div style="border: 1px solid #ccc">
           <Toolbar
@@ -72,13 +81,21 @@ export default {
         time: [{ required: true, message: '请输入活动时间', trigger: 'blur' }],
         detail: [
           { required: true, message: '请输入活动详情', trigger: 'blur' }
+        ],
+        deadline: [
+          {
+            required: true,
+            message: '请选择报名结束时间',
+            trigger: 'blur'
+          }
         ]
       },
       form: {
         activityName: '',
         place: '',
         time: '',
-        detail: ''
+        detail: '',
+        deadline: ''
         //
       },
       //
@@ -113,6 +130,11 @@ export default {
           dayjs(res.data.startTime).format('YYYY-MM-DD HH:mm:ss'),
           dayjs(res.data.endTime).format('YYYY-MM-DD HH:mm:ss')
         ])
+        this.$set(
+          this.form,
+          'deadline',
+          dayjs(res.data.deadline).format('YYYY-MM-DD HH:mm:ss')
+        )
       }
     },
 
@@ -128,13 +150,14 @@ export default {
             this.$message.error('请输入活动详情')
             return
           }
-          const { activityName, place, time, detail } = this.form
+          const { activityName, place, time, detail, deadline } = this.form
           const params = {
             activityName,
             place,
             startTime: time[0],
             endTime: time[1],
             detail,
+            deadline,
             id: this.$route.query.id
           }
           if (params.id) {

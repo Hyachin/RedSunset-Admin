@@ -45,6 +45,7 @@
       <el-table-column prop="activityName" label="活动名称" />
       <el-table-column prop="startTime" label="开始时间" />
       <el-table-column prop="endTime" label="结束时间" />
+      <el-table-column prop="deadline" label="报名截止时间" />
       <!-- 线上或线下 -->
       <el-table-column prop="place" label="活动地点" />
       <el-table-column prop="participants" label="当前参与/报名人数" />
@@ -158,6 +159,8 @@ export default {
           item.startTime = dayjs(item.startTime).format('YYYY-MM-DD')
           item.endTime = dayjs(item.endTime).format('YYYY-MM-DD')
           item.publishTime = dayjs(item.publishTime).format('YYYY-MM-DD')
+          item.deadline = dayjs(item.deadline).format('YYYY-MM-DD')
+          item.participants = item.activitysignups.length
         })
       }
     },
