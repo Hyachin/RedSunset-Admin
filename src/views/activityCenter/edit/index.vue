@@ -34,7 +34,52 @@
           placeholder="请选择报名截止时间"
         />
       </el-form-item>
-
+      <el-form-item label="活动封面" prop="imageId">
+        <el-upload
+          :limit="1"
+          :action="baseUrl + '/activity/upload'"
+          list-type="picture-card"
+          :headers="headers"
+          :on-success="handleUploadSuccess"
+          :on-preview="handlePictureCardPreview"
+          :on-exceed="handlePictureCardExceed"
+          :file-list="fileList"
+        >
+          <i slot="default" class="el-icon-plus" />
+          <div slot="file" slot-scope="{ file }">
+            <img
+              class="el-upload-list__item-thumbnail"
+              :src="file.url"
+              alt=""
+            >
+            <span class="el-upload-list__item-actions">
+              <span
+                class="el-upload-list__item-preview"
+                @click="handlePictureCardPreview(file)"
+              >
+                <i class="el-icon-zoom-in" />
+              </span>
+              <span
+                v-if="!disabled"
+                class="el-upload-list__item-delete"
+                @click="handleDownload(file)"
+              >
+                <i class="el-icon-download" />
+              </span>
+              <span
+                v-if="!disabled"
+                class="el-upload-list__item-delete"
+                @click="handleRemove(file)"
+              >
+                <i class="el-icon-delete" />
+              </span>
+            </span>
+          </div>
+        </el-upload>
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
+      </el-form-item>
       <el-form-item label="活动详情" prop="detail">
         <div style="border: 1px solid #ccc">
           <Toolbar
@@ -73,6 +118,10 @@ export default {
   components: { Editor, Toolbar },
   data() {
     return {
+      headers: {
+        token:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNjc4OTU3Mjg5fQ.pVOMBPTYD4_6JH4MhVaT6MoExJ054mxhaTSOtiQTPcU'
+      },
       rules: {
         activityName: [
           { required: true, message: '请输入活动名称', trigger: 'blur' }
@@ -88,6 +137,9 @@ export default {
             message: '请选择报名结束时间',
             trigger: 'blur'
           }
+        ],
+        imageId: [
+          { required: true, message: '请上传活动封面', trigger: 'change' }
         ]
       },
       form: {
@@ -108,7 +160,12 @@ export default {
         disabledDate(v) {
           return v.getTime() < new Date().getTime() - 86400000 //  - 86400000是否包括当天
         }
-      }
+      },
+      dialogImageUrl: '',
+      dialogVisible: false,
+      disabled: false,
+      baseUrl: process.env.VUE_APP_Back_End,
+      fileList: []
     }
   },
   mounted() {
@@ -126,6 +183,13 @@ export default {
       const res = await reqActivityInfo(this.$route.query.id)
       if (res.status === 200) {
         this.form = res.data
+        this.$set(this.form, 'imageId', this.form.cover)
+        this.fileList = [
+          {
+            name: '1.jpg',
+            url: process.env.VUE_APP_Back_End_Resource + this.form.cover
+          }
+        ]
         this.$set(this.form, 'time', [
           dayjs(res.data.startTime).format('YYYY-MM-DD HH:mm:ss'),
           dayjs(res.data.endTime).format('YYYY-MM-DD HH:mm:ss')
@@ -158,12 +222,11 @@ export default {
             endTime: time[1],
             detail,
             deadline,
-            id: this.$route.query.id
+            id: this.$route.query.id,
+            cover: this.form.imageId
           }
           if (params.id) {
-            console.log('发布- 修改', params)
             const res = await reqActivityEdit(params)
-            console.log('111', res)
             if (res.status === 200) {
               this.$message.success('修改成功')
               this.$router.back()
@@ -174,13 +237,33 @@ export default {
               this.$message.success('添加成功')
               this.$router.back()
             }
-            console.log('发布- 新增', res)
           }
         }
       })
     },
     onCreated(editor) {
       this.editor = Object.seal(editor) // 一定要用 Object.seal() ，否则会报错
+    },
+    handleRemove(file) {
+      console.log(file)
+      this.$set(this.form, 'imageId', '')
+      this.fileList = []
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handleDownload(file) {
+      console.log(file)
+    },
+    handleUploadSuccess(res, file) {
+      console.log('成功回调', res, file)
+      this.$set(this.form, 'imageId', res.data.url)
+      this.imageUrl = URL.createObjectURL(file.raw)
+      this.$refs.form.clearValidate('imageId')
+    },
+    handlePictureCardExceed(files, fileList) {
+      this.$message.error('你只能上传一张图片')
     }
   }
 }
