@@ -17,3 +17,12 @@ export function reqCourseDel(id) {
     }
   })
 }
+// 查看课程详情
+export function reqCourseDetail(id) {
+  return request({
+    url: '/course/detail',
+    params: {
+      id
+    }
+  })
+}

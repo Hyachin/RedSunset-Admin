@@ -61,7 +61,7 @@
           <template>
             <el-popconfirm
               title="你确定删除此活动吗？"
-              @onConfirm="deleteActivity(scope.row)"
+              @confirm="deleteActivity(scope.row)"
             >
               <el-button
                 slot="reference"

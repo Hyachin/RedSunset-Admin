@@ -18,7 +18,7 @@ const videoManageRouter = {
       hidden: true,
       component: () => import('@/views/videoManage/detail'),
       name: 'VideoManageDetail',
-      meta: { title: '活动审核', icon: 'list', noCache: true }
+      meta: { title: '视频查看', icon: 'list', noCache: true }
     }
   ],
   meta: {

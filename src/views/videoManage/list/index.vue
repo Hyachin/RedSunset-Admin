@@ -99,15 +99,13 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            @click="toEdit(scope.row)"
-          >审核</el-button>
+          <el-button type="text" size="small" @click="toEdit(scope.row)">{{
+            scope.row.isAudit === false ? "审核" : "详情"
+          }}</el-button>
           <template>
             <el-popconfirm
               title="你确定删除此课程吗？"
-              @onConfirm="deleteCourse(scope.row)"
+              @confirm="deleteCourse(scope.row)"
             >
               <el-button
                 slot="reference"
@@ -226,11 +224,13 @@ export default {
     },
     toEdit(item) {
       console.log('item', item)
-      if (item) {
-        this.$router.push(`/activityCenter/edit?id=${item.id}`)
-      } else {
-        this.$router.push(`/activityCenter/edit`)
-      }
+      // if (item) {
+      //   this.$router.push(`/videoManage/edit?id=${item.id}`);
+      // } else {
+      this.$router.push(
+        `/videoManage/detail?isAudit=${item.isAudit}&id=${item.id}`
+      )
+      // }
     },
     async deleteCourse(row) {
       console.log(row)
