@@ -26,3 +26,10 @@ export function reqCourseDetail(id) {
     }
   })
 }
+// 审核
+export function reqVideoAuditEdit(params) {
+  return request({
+    url: '/video/auditEdit',
+    params
+  })
+}

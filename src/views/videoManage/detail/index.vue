@@ -11,7 +11,7 @@
         label-class-name="my-label"
         content-class-name="my-content"
       >{{ courseDetail.courseName }}</el-descriptions-item>
-      <el-descriptions-item label="课程简介">{{
+      <el-descriptions-item content-style="max-width:380px" label="课程简介">{{
         courseDetail.introduction
       }}</el-descriptions-item>
       <el-descriptions-item label="授课讲师">{{
@@ -68,45 +68,83 @@
         <!-- <el-table-column prop="address" label="活动简介" /> -->
         <el-table-column prop="place" label="审核状态">
           <template v-slot="{ row }">
-            <div v-if="row.isAudit === 0" style="color: #eb0827">待审核</div>
-            <div v-else>已审核</div>
+            <div v-if="row.isAudit === 0">待审核</div>
+            <div v-else-if="row.isAudit === 1" style="color: #22b14c">
+              审核通过
+            </div>
+            <div v-else style="color: #eb0827">审核未通过</div>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="100">
-          <template slot-scope="">
+          <template slot-scope="{ row }">
             <el-button
               type="text"
               size="small"
-              @click="checkVideo"
+              @click="checkVideo(row)"
             >查看</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="视频标题" :visible.sync="dialogTableVisible">
-      这里放视频组件
+    <el-dialog :title="currentRow.title" :visible.sync="dialogTableVisible">
+      <div v-if="dialogTableVisible">
+        <video-player
+          ref="videoPlayer"
+          style="width: 100%; height: 100%"
+          class="video-player-box"
+          :options="playerOptions"
+          :playsinline="true"
+          custom-event-name="customstatechangedeventname"
+        />
+        <div v-if="showAuditBtnGroup" class="auditBtnGroup">
+          <el-button type="primary" @click="auditEdit(1)">审核通过</el-button>
+          <el-button type="danger" @click="auditEdit(2)">审核不通过</el-button>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import dayjs from 'dayjs'
-import { reqCourseDetail } from '@/api/course'
+import 'video.js/dist/video-js.css'
+
+import { videoPlayer } from 'vue-video-player'
+import { reqCourseDetail, reqVideoAuditEdit } from '@/api/course'
 export default {
+  components: {
+    videoPlayer
+  },
   data() {
     return {
+      currentRow: {
+        url: ''
+      },
       isLoading: false,
       dialogTableVisible: false,
-      tableData: [
-        {
-          courseName: '12'
-        }
-      ],
+      tableData: [],
       courseDetail: {
         user: {},
         coursetype: {
           super: {}
         }
+      },
+      showAuditBtnGroup: false,
+      // 视频配置
+      playerOptions: {
+        // videojs options
+        autoplay: true,
+        fluid: true,
+        muted: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [
+          {
+            type: 'video/mp4',
+            src: 'https://vjs.zencdn.net/v/oceans.mp4'
+          }
+        ],
+        poster: '/static/images/author.jpg'
       }
     }
   },
@@ -129,18 +167,25 @@ export default {
     },
     srcList() {
       return [this.coursePic, this.detailPic]
+    },
+    player() {
+      return this.$refs.videoPlayer.player
     }
   },
   mounted() {
-    console.log('isAudit', this.isAudit)
     this.getCourseDetail()
   },
   methods: {
     goBack() {
       this.$router.back()
     },
-    checkVideo() {
+    checkVideo(row) {
+      console.log('row', row)
       this.dialogTableVisible = true
+      this.currentRow = row
+      this.showAuditBtnGroup = row.isAudit === 0
+      this.playerOptions.sources[0].src =
+        process.env.VUE_APP_Back_End_Resource + this.currentRow.url
     },
     async getCourseDetail() {
       this.isLoading = true
@@ -156,12 +201,28 @@ export default {
           )
         })
       }
+    },
+    async auditEdit(isAudit) {
+      console.log('同意', isAudit)
+      const res = await reqVideoAuditEdit({
+        id: this.currentRow.id,
+        isAudit
+      })
+      if (res.status === 200) {
+        this.showAuditBtnGroup = false
+        this.getCourseDetail()
+      }
     }
   }
 }
 </script>
 
 <style lang="scss">
+.video-js .vjs-big-play-button {
+  margin-left: 50%;
+  margin-top: 25%;
+  transform: translate(-50%, -50%);
+}
 .wrapper {
   padding: 20px;
 }
@@ -180,5 +241,10 @@ export default {
   height: 100px;
   border-radius: 8px;
   border: 1px solid #eee;
+}
+.auditBtnGroup {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 </style>

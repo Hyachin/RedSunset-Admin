@@ -93,14 +93,17 @@
       <el-table-column prop="place" label="审核状态">
         <template v-slot="{ row }">
           <!-- <div>已审核</div> -->
-          <div v-if="row.isAudit === false" style="color: #eb0827">待审核</div>
-          <div v-else>已审核</div>
+          <div v-if="row.isAudit === 0">待审核</div>
+          <div v-else-if="row.isAudit === 1" style="color: #22b14c">
+            审核通过
+          </div>
+          <div v-else style="color: #eb0827">审核未通过</div>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="toEdit(scope.row)">{{
-            scope.row.isAudit === false ? "审核" : "详情"
+            scope.row.isAudit === 0 ? "审核" : "详情"
           }}</el-button>
           <template>
             <el-popconfirm
@@ -215,9 +218,18 @@ export default {
           item.teacherName = item.user.username
           item.typeName1 = item.coursetype.super.title
           item.typeName2 = item.coursetype.title
-          item.isAudit = !item.videos.some((item2) => {
+          const flag = !item.videos.some((item2) => {
+            // false 未审核 true已审核
             return item2.isAudit === 0
           })
+          if (flag) {
+            const flag2 = item.videos.some((item2) => {
+              return item2.isAudit === 2
+            })
+            item.isAudit = flag2 ? 2 : 1
+          } else {
+            item.isAudit = 0
+          }
           // console.log("isAudit", isAudit); // true 是审核完
         })
       }
