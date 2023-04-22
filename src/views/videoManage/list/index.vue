@@ -50,8 +50,9 @@
           clearable
           placeholder="请选择"
         >
-          <el-option label="已审核" :value="1" />
           <el-option label="待审核" :value="0" />
+          <el-option label="审核通过" :value="1" />
+          <el-option label="审核未通过" :value="2" />
         </el-select>
       </el-form-item>
       <el-form-item label="发布时间">
@@ -136,6 +137,7 @@
 <script>
 import { reqCourseList, reqCourseDel } from '@/api/course'
 import { reqCourseTypeList, reqCourseTypeList2 } from '@/api/courseType'
+import dayjs from 'dayjs'
 export default {
   data() {
     return {
@@ -218,6 +220,11 @@ export default {
           item.teacherName = item.user.username
           item.typeName1 = item.coursetype.super.title
           item.typeName2 = item.coursetype.title
+
+          item.publishTime = dayjs(item.publishTime).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+
           const flag = !item.videos.some((item2) => {
             // false 未审核 true已审核
             return item2.isAudit === 0

@@ -40,6 +40,7 @@
       <el-descriptions-item label="课程详情">
         <div v-if="courseDetail.detail">
           <el-image
+            fit="contain"
             class="myImage"
             :src="detailPic"
             :preview-src-list="srcList"
@@ -98,7 +99,10 @@
         />
         <div v-if="showAuditBtnGroup" class="auditBtnGroup">
           <el-button type="primary" @click="auditEdit(1)">审核通过</el-button>
-          <el-button type="danger" @click="auditEdit(2)">审核不通过</el-button>
+          <el-button
+            style="background: #eb0827; color: #fff"
+            @click="auditEdit(2)"
+          >审核不通过</el-button>
         </div>
       </div>
     </el-dialog>

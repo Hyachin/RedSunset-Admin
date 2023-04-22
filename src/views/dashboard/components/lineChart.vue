@@ -11,7 +11,7 @@ export default {
     console.log(lineCharts)
     lineCharts.setOption({
       title: {
-        text: '播放量和讨论数统计',
+        text: '动态发布数和课程讨论数统计',
         x: 'center',
         y: '10'
       },
@@ -26,7 +26,7 @@ export default {
         }
       },
       legend: {
-        data: ['播放量', '讨论数'],
+        data: ['动态发布数', '课程讨论数'],
         y: '10%'
       },
 
@@ -62,26 +62,24 @@ export default {
       ],
       series: [
         {
-          name: '播放量',
+          name: '动态发布数',
           type: 'line',
-          stack: 'Total',
-          smooth: 0.6,
           areaStyle: {},
+          smooth: 0.3,
           emphasis: {
             focus: 'series'
           },
-          data: [120, 132, 101, 134, 90, 230, 210, 100, 200, 300]
+          data: [0, 0, 0, 1, 1, 3, 0, 0, 0, 0]
         },
         {
-          name: '讨论数',
+          name: '课程讨论数',
           type: 'line',
-          smooth: 0.6,
-          stack: 'Total',
+          smooth: 0.3,
           areaStyle: {},
           emphasis: {
             focus: 'series'
           },
-          data: [220, 182, 191, 234, 290, 330, 310, 158, 198, 278]
+          data: [0, 0, 0, 2, 0, 1, 5, 0, 0, 0]
         }
       ]
     })

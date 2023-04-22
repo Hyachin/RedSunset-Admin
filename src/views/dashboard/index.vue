@@ -7,7 +7,7 @@
         <h3 class="item-title">用户数</h3>
         <div class="item-bottom">
           <i class="iconfont icon-customer-official-fill" />
-          <span class="item-count">100000</span>
+          <span class="item-count">{{ userTotal }}</span>
         </div>
       </div></el-col>
       <el-col
@@ -16,7 +16,7 @@
         <h3 class="item-title">课程数</h3>
         <div class="item-bottom">
           <i class="iconfont icon-vip-fill" />
-          <span class="item-count">1000</span>
+          <span class="item-count">{{ courseTotal }}</span>
         </div>
       </div></el-col>
       <el-col
@@ -25,7 +25,7 @@
         <h3 class="item-title">讨论数</h3>
         <div class="item-bottom">
           <i class="iconfont icon-hot-for-atmosphere" />
-          <span class="item-count">100</span>
+          <span class="item-count">{{ courseCommentTotal }}</span>
         </div>
       </div></el-col>
       <el-col
@@ -34,7 +34,7 @@
         <h3 class="item-title">动态数</h3>
         <div class="item-bottom">
           <i class="iconfont icon-charts-line" />
-          <span class="item-count">10</span>
+          <span class="item-count">{{ dynamicTotal }}</span>
         </div>
       </div></el-col>
     </el-row>
@@ -53,6 +53,12 @@
 </template>
 
 <script>
+import {
+  reqUserTotal,
+  reqCourseTotal,
+  reqCourseCommentTotal,
+  reqDynamicTotal
+} from '@/api/analysis'
 import CourseList from './components/courseList.vue'
 import LineChart from './components/lineChart.vue'
 import PieChart from './components/pieChart.vue'
@@ -64,7 +70,35 @@ export default {
     PieChart
   },
   data() {
-    return {}
+    return {
+      userTotal: 0,
+      courseTotal: 0,
+      courseCommentTotal: 0,
+      dynamicTotal: 0
+    }
+  },
+  mounted() {
+    this.init()
+  },
+  methods: {
+    async init() {
+      let res = {}
+      res = await Promise.all([
+        await reqUserTotal(),
+        await reqCourseTotal(),
+        await reqCourseCommentTotal(),
+        await reqDynamicTotal()
+      ])
+      this.userTotal = res[0].data
+      this.courseTotal = res[1].data
+      this.courseCommentTotal = res[2].data
+      this.dynamicTotal = res[3].data
+
+      // if (res.status === 200) {
+      //   this[key] = res.data;
+      // }
+      // console.log("赋值", this[key]);
+    }
   }
 }
 </script>
