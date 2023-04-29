@@ -12,11 +12,11 @@
         type=""
         prop="id"
         label="分类ID"
-        width="70"
+        width="80"
         align="center"
       />
-      <el-table-column prop="title" label="分类名称" sortable width="200" />
-      <el-table-column label="头图" width="200">
+      <el-table-column prop="title" label="分类名称" width="200" />
+      <el-table-column label="头图">
         <template v-slot="{ row }">
           <img
             v-if="row.pic"
@@ -26,17 +26,17 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="200">
         <template v-slot="{ row }">
           <el-button
-            type="success"
+            type="text"
             icon="el-icon-plus"
             size="mini"
             @click="add(row)"
           >添加</el-button>
           <el-button
             style="margin-right: 10px"
-            type="primary"
+            type="text"
             icon="el-icon-edit"
             size="mini"
             @click="edit(row)"
@@ -44,7 +44,7 @@
           <el-popconfirm title="这是一段内容确定删除吗？" @confirm="del(row)">
             <el-button
               slot="reference"
-              type="danger"
+              type="text"
               icon="el-icon-delete"
               size="mini"
             >删除</el-button>
@@ -52,7 +52,10 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="添加分类" :visible.sync="showDialog">
+    <el-dialog
+      :title="isEdit ? '编辑分类' : '添加分类'"
+      :visible.sync="showDialog"
+    >
       <!-- <div>1</div> -->
       <el-form
         ref="form"
