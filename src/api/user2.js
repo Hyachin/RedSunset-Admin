@@ -6,3 +6,9 @@ export function login(data) {
     data
   })
 }
+export function reqUserList(params) {
+  return request({
+    url: '/user/list',
+    params
+  })
+}
