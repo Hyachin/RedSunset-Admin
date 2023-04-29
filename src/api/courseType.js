@@ -16,3 +16,33 @@ export function reqCourseTypeList2(parentId) {
     }
   })
 }
+// 全部分类
+export function reqCourseTypeList3() {
+  return request({
+    url: '/courseType/list3'
+  })
+}
+// 添加
+export function reqCourseTypeAdd(data) {
+  return request({
+    url: '/courseType/add',
+    method: 'post',
+    data
+  })
+}
+// 编辑
+export function reqCourseTypeEdit(data) {
+  return request({
+    url: '/courseType/edit',
+    method: 'put',
+    data
+  })
+}
+// 删除
+export function reqCourseTypeDel(data) {
+  return request({
+    url: '/courseType/del',
+    method: 'delete',
+    data
+  })
+}
