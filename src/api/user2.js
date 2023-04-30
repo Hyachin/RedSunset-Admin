@@ -12,3 +12,27 @@ export function reqUserList(params) {
     params
   })
 }
+// 注册
+export function reqUserRegister(data) {
+  return request({
+    url: '/user/register',
+    method: 'post',
+    data
+  })
+}
+// 编辑用户信息
+export function reqUserEdit2(data) {
+  return request({
+    url: '/user/edit2',
+    method: 'post',
+    data
+  })
+}
+// 重置密码
+export function reqRefreshPassword(data) {
+  return request({
+    url: '/user/refreshPassword',
+    method: 'post',
+    data
+  })
+}
